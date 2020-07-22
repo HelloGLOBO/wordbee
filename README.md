@@ -1,0 +1,2 @@
+# wordbee
+Wordbee API Gem
