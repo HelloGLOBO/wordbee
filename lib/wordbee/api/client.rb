@@ -46,10 +46,12 @@ module Wordbee
           f.headers = headers
           f.params = params
           f.adapter Faraday.default_adapter
-          f.proxy = "#{@proxy_port}://#{@proxy_auth}#{@proxy_path}" if @proxy_port && @proxy_path
+          f.proxy = "#{Wordbee.config.proxy_path}" if Wordbee.config.proxy_path
           f.options.open_timeout = timeout
           f.options.timeout = timeout
         end
+
+        puts "_request #{@http_client.inspect}"
 
         begin
           if method == 'GET'
