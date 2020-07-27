@@ -9,18 +9,23 @@ module Wordbee
         @wordbee_host = wordbee_host
         @account_id = account_id
         @password = password
+        @response_format = response_format
       end
 
       def connect
         _url = "/api/connect?account=#{@account_id}&pwd=#{@password}&json=#{self.is_json?}"
-
         response = request(_url)
-        puts response
+        if response
+          @auth_token = response
+        end
       end
 
       def disconnect
-
-        @auth_token = nil
+        _url = "/api/disconnect?token=" + @auth_token
+        response = request(_url)
+        if response
+          @auth_token = nil
+        end
       end
 
       def is_json?
@@ -30,15 +35,12 @@ module Wordbee
 
       def request(path, method = 'GET', params={}, data={}, headers={}, timeout=nil)
         url = build_uri(path)
-        puts url.to_s
-        puts CGI::parse(url.query)
         params.merge!(CGI::parse(url.query))
         _request(url.host, url.port, method, url.path, params, data, headers, timeout)
       end
 
       def _request(host, port, method, uri, params={}, data={}, headers={}, timeout=nil)
 
-        puts "_request #{host} - #{port} - #{method} - #{uri} - #{params}"
         @http_client = Faraday.new(url: 'https://' + host + ':' + port.to_s, ssl: { verify: true }) do |f|
           f.options.params_encoder = Faraday::FlatParamsEncoder
           f.headers = headers
@@ -49,27 +51,26 @@ module Wordbee
           f.options.timeout = timeout
         end
 
-        puts "_request #{@http_client.inspect}"
         begin
           if method == 'GET'
-            @response = @http_client.get(uri)
+            response = @http_client.get(uri)
           else
-
+            response = @http_client.post(uri, data)
           end
-          @response = @http_client.send(method.downcase.to_sym, uri, method == 'GET' ? params : data)
         rescue StandardError => e
           puts e.message
           puts e.backtrace.inspect
         end
 
-        puts "_request resposnse = #{@response.inspect}"
+        puts "_request - " + response.inspect
 
         if response.body && !response.body.empty?
-          object = response.body
+          object = JSON.parse response.body
         elsif response.status == 400
           object = { message: 'Bad request', code: 400 }.to_json
         else
           # what to do??
+          object = nil
         end
 
         object
