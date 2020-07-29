@@ -3,7 +3,7 @@
 module Wordbee
   class Configuration
 
-    attr_accessor :logger, :proxy_path, :proxy_port, :proxy_auth
+    attr_accessor :logger, :proxy_path
 
     def initialize
       @logger = Logger.new(STDOUT)
