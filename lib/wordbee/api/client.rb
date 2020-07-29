@@ -1,15 +1,24 @@
 # frozen_string_literal: true
+require 'faraday'
 
 module Wordbee
   module API
     class Client
       attr_accessor :wordbee_host, :account_id, :password, :response_format, :auth_token
 
-      def initialize(wordbee_host=nil, account_id=nil, password=nil, response_format = :json)
+      DEFAULT_HOST = 'https://api.eu.wordbee-translator.com:32570'
+
+      def initialize(account_id, password, wordbee_host=DEFAULT_HOST, response_format = :json)
         @wordbee_host = wordbee_host
         @account_id = account_id
         @password = password
         @response_format = response_format
+
+        if block_given?
+          self.connect
+          yield self
+          self.disconnect
+        end
       end
 
       def connect
@@ -45,10 +54,10 @@ module Wordbee
           f.options.params_encoder = Faraday::FlatParamsEncoder
           f.headers = headers
           f.params = params
-          f.adapter Faraday.default_adapter
           f.proxy = "#{@proxy_port}://#{@proxy_auth}#{@proxy_path}" if @proxy_port && @proxy_path
           f.options.open_timeout = timeout
           f.options.timeout = timeout
+          f.adapter Faraday.default_adapter
         end
 
         begin
@@ -65,6 +74,9 @@ module Wordbee
         puts "_request - " + response.inspect
 
         if response.body && !response.body.empty?
+          if response.body.include?('IP address not authorised')
+            raise Wordbee::API::ClientError.new('IP Address not authorized')
+          end
           object = JSON.parse response.body
         elsif response.status == 400
           object = { message: 'Bad request', code: 400 }.to_json
