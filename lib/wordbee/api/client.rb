@@ -55,6 +55,7 @@ module Wordbee
       def request(path, method: 'GET', params:{}, data:{}, headers:{}, timeout: nil, do_struct: true, file_upload: false)
         url = build_uri(path)
         params.merge!(CGI::parse(url.query)) if url.query
+        params[:token] = @auth_token if @auth_token
         _request(url.host, url.port, method, url.path, params: params, data: data, headers: headers, timeout: timeout, file_upload: file_upload)
       end
 
@@ -75,8 +76,11 @@ module Wordbee
         logger.debug "_request #{@http_client.inspect}"
 
         begin
-          if method == 'GET'
+          case method
+          when 'GET'
             response = @http_client.get(uri)
+          when 'PUT'
+            response = @http_client.put(uri, data)
           else
             response = @http_client.post(uri, data)
           end

@@ -7,7 +7,7 @@ module Wordbee
 	module API
 		module Methods
 
-			include Orders
+
 		end
 	end
 end
