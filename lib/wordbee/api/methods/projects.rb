@@ -17,7 +17,7 @@ class ProjectsContext < MethodContext
 
 	attr_accessor :project_id
 
-	def initialize(context, project_id)
+	def initialize(context, project_id = nil)
 		super context
 		@project_id = project_id
 	end

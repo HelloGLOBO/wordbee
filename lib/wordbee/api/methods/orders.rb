@@ -6,8 +6,8 @@ module Wordbee
 
 
 			module Orders
-				def orders
-					OrdersContext.new(self)
+				def orders(order_id = nil)
+					OrdersContext.new(self, order_id)
 				end
 			end
 
@@ -18,6 +18,12 @@ module Wordbee
 end
 
 class OrdersContext < MethodContext
+	attr_accessor :order_id
+
+	def initialize(context, order_id = nil)
+		super context
+		@order_id = order_id
+	end
 
 	def create(data, zipped_files)
 		file = self.client.file_for_upload(zipped_files)
