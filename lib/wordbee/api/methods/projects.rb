@@ -4,8 +4,8 @@ module Wordbee
 	module API
 		module Methods
 			module Projects
-				def projects
-					ProjectsContext.new(self)
+				def projects(project_id = nil)
+					ProjectsContext.new(self, project_id)
 				end
 			end
 			include Projects
@@ -15,7 +15,14 @@ end
 
 class ProjectsContext < MethodContext
 
-	def get(project_id)
+	attr_accessor :project_id
+
+	def initialize(context, project_id)
+		super context
+		@project_id = project_id
+	end
+
+	def get(project_id = self.project_id)
 		self.client.request("/projects/#{project_id}")
 	end
 
@@ -25,9 +32,10 @@ class ProjectsContext < MethodContext
 		self.client.request("/projects", params: params)
 	end
 
-	def update(project_id, data)
+	def update(project_id = self.project_id, data)
 		self.client.request("/projects/#{project_id}", method: 'PUT', data: data.to_json)
 	end
+
 
 end
 
