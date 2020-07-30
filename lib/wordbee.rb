@@ -9,7 +9,7 @@ require 'cgi'
 require "wordbee/version"
 require "wordbee/configuration"
 
-Dir[File.dirname(__FILE__) + '/wordbee/api/**/*.rb'].sort.each do |file|
+Dir[File.dirname(__FILE__) + '/wordbee/api/*.rb'].sort.each do |file|
   require file
 end
 

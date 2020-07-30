@@ -1,19 +1,13 @@
 RSpec.describe Wordbee do
-	ACCOUNT_ID = ENV['WORDBEE_ACCOUNT_ID']
-	PASSWORD = ENV['WORDBEE_ACCOUNT_PASSWORD']
 
-	PROXIES = [
-			ENV['WORDBEE_PROXY_1'],
-			ENV['WORDBEE_PROXY_2']
-	]
 
 	context 'config' do
 		it 'should persists settings in singletong' do
 			Wordbee.configure do |config|
-				config.proxy_path = PROXIES.first
+				config.proxy_path = @proxies.first
 			end
 
-			expect(Wordbee.config.proxy_path).to eql PROXIES.first
+			expect(Wordbee.config.proxy_path).to eql @proxies.first
 		end
 	end
 
@@ -23,18 +17,18 @@ RSpec.describe Wordbee do
 
 			before :all do
 				Wordbee.configure do |config|
-					config.proxy_path = PROXIES.first
+					config.proxy_path = @proxies.first
 				end
 			end
 
 			it 'should connect' do
-				client = Wordbee::API::Client.new(ACCOUNT_ID, PASSWORD)
+				client = Wordbee::API::Client.new(@account_id, @account_password)
 				auth_token = client.connect
 				expect(auth_token).not_to be_nil
 			end
 
 			it 'should disconnect' do
-				client = Wordbee::API::Client.new(ACCOUNT_ID, PASSWORD)
+				client = Wordbee::API::Client.new(@account_id, @account_password)
 				client.connect
 				client.disconnect
 				auth_token = client.auth_token
@@ -42,7 +36,7 @@ RSpec.describe Wordbee do
 			end
 
 			it 'should connect with block' do
-				Wordbee::API::Client.new(ACCOUNT_ID, PASSWORD) do |c|
+				Wordbee::API::Client.new(@account_id, @account_password) do |c|
 					auth_token = c.auth_token
 					expect(auth_token).not_to be_nil
 				end
@@ -58,13 +52,13 @@ RSpec.describe Wordbee do
 			end
 
 			it 'should connect' do
-				client = Wordbee::API::Client.new(ACCOUNT_ID, PASSWORD, proxy: PROXIES.first)
+				client = Wordbee::API::Client.new(@account_id, @account_password, proxy: @proxies.sample)
 				auth_token = client.connect
 				expect(auth_token).not_to be_nil
 			end
 
 			it 'should disconnect' do
-				client = Wordbee::API::Client.new(ACCOUNT_ID, PASSWORD, proxy: PROXIES.first)
+				client = Wordbee::API::Client.new(@account_id, @account_password, proxy: @proxies.sample)
 				client.connect
 				client.disconnect
 				auth_token = client.auth_token

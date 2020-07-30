@@ -1,9 +1,11 @@
 # frozen_string_literal: true
 require 'faraday'
+require 'wordbee/api/methods'
 
 module Wordbee
   module API
     class Client
+      include Wordbee::API::Methods
       attr_accessor :wordbee_host, :account_id, :password, :response_format, :auth_token, :proxy_path
 
       DEFAULT_HOST = 'https://api.eu.wordbee-translator.com:32570'
@@ -15,24 +17,31 @@ module Wordbee
         @response_format = response_format
         @proxy_path = proxy
 
-        if block_given?
-          self.connect
+        do_connected do
           yield self
-          self.disconnect
-        end
+        end if block_given?
+      end
+
+      def do_connected
+        return unless block_given?
+        self.connect
+        yield self
+        self.disconnect
       end
 
       def connect
-        _url = "/api/connect?account=#{@account_id}&pwd=#{@password}&json=#{self.is_json?}"
-        response = request(_url, do_struct: false)
+        response = request("/api/connect", do_struct: false, params: {
+            account: @account_id,
+            pwd: @password,
+            json: self.is_json?,
+        })
         if response
           @auth_token = response
         end
       end
 
       def disconnect
-        _url = "/api/disconnect?token=#{@auth_token}"
-        response = request(_url, do_struct: false)
+        response = request("/api/disconnect", do_struct: false, params: {token: @auth_token})
         if response && response.code && response.code.to_i == 200
           @auth_token = nil
         end
@@ -43,13 +52,13 @@ module Wordbee
         false
       end
 
-      def request(path, method: 'GET', params:{}, data:{}, headers:{}, timeout: nil, do_struct: true)
+      def request(path, method: 'GET', params:{}, data:{}, headers:{}, timeout: nil, do_struct: true, file_upload: false)
         url = build_uri(path)
-        params.merge!(CGI::parse(url.query))
-        _request(url.host, url.port, method, url.path, params: params, data: data, headers: headers, timeout: timeout)
+        params.merge!(CGI::parse(url.query)) if url.query
+        _request(url.host, url.port, method, url.path, params: params, data: data, headers: headers, timeout: timeout, file_upload: file_upload)
       end
 
-      def _request(host, port, method, uri, params: {}, data: {}, headers: {}, timeout: nil, do_struct: true)
+      def _request(host, port, method, uri, params: {}, data: {}, headers: {}, timeout: nil, do_struct: true, file_upload: false)
         proxy_path = @proxy_path || config.proxy_path
 
         @http_client = Faraday.new(url: 'https://' + host + ':' + port.to_s, ssl: { verify: true }) do |f|
@@ -59,6 +68,7 @@ module Wordbee
           f.proxy = proxy_path unless proxy_path.to_s.empty?
           f.options.open_timeout = timeout
           f.options.timeout = timeout
+          f.request :multipart if file_upload
           f.adapter Faraday.default_adapter
         end
 
@@ -73,21 +83,21 @@ module Wordbee
         rescue StandardError => e
           logger.error e.message
           logger.error e.backtrace.inspect
+          raise Wordbee::API::ClientError.new(e)
         end
 
         logger.debug "_request - #{response.inspect}"
 
+        if response.status > 299
+          if response.body && response.body.include?('IP address not authorised')
+            raise Wordbee::API::ClientError.new('IP Address not authorized')
+          else
+            raise Wordbee::API::ClientError.new(parse_response(response, false).to_s)
+          end
+        end
+
         if response.body && !response.body.empty?
-
-					raise Wordbee::API::ClientError.new('IP Address not authorized') if response.body.include?('IP address not authorised')
-					object = json = JSON.parse response.body
-
-					object = begin
-						OpenStruct.new(json)
-					rescue
-						json
-					end if do_struct
-
+          object = parse_response(response, do_struct)
         elsif response.status == 400
           object = OpenStruct.new({ message: 'Bad request', code: 400 })
         elsif response.status == 200
@@ -111,6 +121,30 @@ module Wordbee
 
       def logger
         config.logger
+      end
+
+      def file_for_upload(file)
+        Faraday::UploadIO.new(file.path, 'application.zip')
+      end
+
+      private
+
+      def parse_response(response, do_struct)
+        object = json = begin
+                 JSON.parse response.body
+               rescue
+                 response.body
+               end
+
+        object = begin
+                   OpenStruct.new(json)
+                 rescue
+                   json
+                 end if do_struct
+
+        logger.debug "_response #{object.inspect}"
+
+        object
       end
     end
   end
