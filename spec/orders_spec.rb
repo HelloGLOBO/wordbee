@@ -1,15 +1,36 @@
 RSpec.describe Wordbee::API::Methods::Orders do
 
+	let(:deadline) {
+		"2020-08-01T00:00:01.0000000Z"
+	}
+
+	let(:test_data) {
+		{
+				"reference": "globo-order-name",
+				"client": {
+						"companyId": 570
+				},
+				"sourceLanguage": "en",
+				"targetLanguages": ["pl-PL", "es-ES"],
+				"deadline": nil,
+				"isDeadlineByFiles": true,
+				"files": [
+						{"name": "test.txt", "deadline": "2020-08-02T00:00:01.0000000Z"},
+				],
+				"customFields": [
+				]
+		}
+
+	}
 
 	let(:order_data) {
 		{
 				client: {
-						companyId: 123,
-						personId: 123,
+						companyId: 570,
 				},
-				option: 123,
-				deadline: DateTime.now + 1000,
-				reference: "reference",
+				# personId: 04645,
+				option: 5,
+				reference: 'globo-test-order',
 				manager: 1234,
 				sourceLanguage: "en",
 				targetLanguages: ['es-ES'],
@@ -17,8 +38,9 @@ RSpec.describe Wordbee::API::Methods::Orders do
 				appointmentStartDate: DateTime.now + 1000,
 				appointmentEndDate: DateTime.now + 2000,
 				isAppointment: true,
+				deadline: deadline,
 				isDeadlineByFiles: false,
-				files: ["file1.name", "file2.name"],
+				files: [{name: test_file_name, deadline: nil}],
 				customFields: [
 						{key: 'custom_field_1', text: 'field 1'},
 						{key: 'custom_field_2', text: 'field 2'},
@@ -26,7 +48,23 @@ RSpec.describe Wordbee::API::Methods::Orders do
 		}
 	}
 
-	it 'should define an orders object on a client' do
+	let(:data) {
+		{
+				client: {
+						companyId: 570,
+				},
+				option: 5,
+				sourceLanguage: "en",
+				targetLanguages: ['es-ES'],
+				reference: 'globo-test-order',
+				deadline: nil,
+				isDeadlineByFiles: true,
+				# personId: 04645,
+				files: [{name: test_file_name, deadline: deadline}],
+		}
+	}
+
+	xit 'should define an orders object on a client' do
 		client = create_client
 		expect(client).to respond_to(:orders)
 		res = client.orders
@@ -39,12 +77,20 @@ RSpec.describe Wordbee::API::Methods::Orders do
 	it 'should create a new order' do
 		create_client do |client|
 			expect {
-				client.orders.create order_data, test_file
+				client.orders.create test_data, test_file
 			}.not_to raise_error
 		end
 	end
 
-	it 'should create a standard order' do
+	xit 'should create a new order with simple data' do
+		create_client do |client|
+			expect {
+				client.orders.create data, test_file
+			}.not_to raise_error
+		end
+	end
+
+	xit 'should create a standard order' do
 		create_client do |client|
 			expect {
 				client.orders.create_standard order_data, test_file
@@ -52,7 +98,7 @@ RSpec.describe Wordbee::API::Methods::Orders do
 		end
 	end
 
-	it 'should find an order' do
+	xit 'should find an order' do
 		create_client do |client|
 			expect {
 				client.orders.create_standard order_data, test_file
@@ -61,7 +107,7 @@ RSpec.describe Wordbee::API::Methods::Orders do
 		end
 	end
 
-	it 'should find all orders' do
+	xit 'should find all orders' do
 		create_client do |client|
 			expect {
 				client.orders.all

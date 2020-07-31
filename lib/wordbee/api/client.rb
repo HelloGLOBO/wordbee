@@ -74,6 +74,8 @@ module Wordbee
         end
 
         logger.debug "_request #{@http_client.inspect}"
+        logger.warn "_request.params #{params.inspect}"
+        logger.warn "_request.body #{data.inspect}"
 
         begin
           case method
@@ -90,13 +92,15 @@ module Wordbee
           raise Wordbee::API::ClientError.new(e)
         end
 
-        logger.debug "_request - #{response.inspect}"
+        logger.warn "_request - #{response.inspect}"
 
         if response.status > 299
           if response.body && response.body.include?('IP address not authorised')
             raise Wordbee::API::ClientError.new('IP Address not authorized')
           else
-            raise Wordbee::API::ClientError.new(parse_response(response, false).to_s)
+            message = parse_response(response, false).to_s
+            logger.warn message
+            raise Wordbee::API::ClientError.new(message)
           end
         end
 

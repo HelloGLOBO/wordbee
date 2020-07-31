@@ -27,7 +27,11 @@ class OrdersContext < MethodContext
 
 	def create(data, zipped_files)
 		file = self.client.file_for_upload(zipped_files)
-		self.client.request("/orders/new_form", method: 'POST', data: data.merge(file: file), file_upload: true)
+		headers = {
+				# "Content-Length": file.size.to_s,
+				# "Transfer-Encoding": 'chunked',
+		}
+		self.client.request("/orders/new_form", method: 'POST', data: file, params: {data: data}, headers: headers, file_upload: true)
 	end
 
 	def create_standard(data, zipped_files)

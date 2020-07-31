@@ -4,9 +4,14 @@ require 'byebug'
 
 
 RSpec.shared_context "shared stuff" do
+	test_file_name = 'test.zip'
+
+	let(:test_file_name) {
+		test_file_name
+	}
 
 	let(:test_file) {
-		File.open(File.dirname(__FILE__) + "/test.zip")
+		File.open(File.dirname(__FILE__) + "/#{test_file_name}")
 	}
 
 	before :all do
