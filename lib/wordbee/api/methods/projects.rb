@@ -23,7 +23,7 @@ class ProjectsContext < MethodContext
 	end
 
 	def get(project_id = self.project_id)
-		self.client.request("/projects/#{project_id}")
+		self.client.request(path(project_id))
 	end
 
 	def find(query)
@@ -33,7 +33,12 @@ class ProjectsContext < MethodContext
 	end
 
 	def update(project_id = self.project_id, data)
-		self.client.request("/projects/#{project_id}", method: 'PUT', data: data.to_json)
+		self.client.request(path(project_id), method: 'PUT', data: data.to_json)
+	end
+
+
+	def path(project_id = @project_id)
+		"/projects/#{project_id}"
 	end
 
 

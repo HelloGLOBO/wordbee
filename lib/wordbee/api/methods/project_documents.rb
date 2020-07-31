@@ -27,14 +27,10 @@ class DocumentsContext < MethodContext
 
 
 	def download(locale = 'en')
-		self.client.request("#{project_path}/documents/#{locale}/file")
+		self.client.request("#{@project_context.path}/documents/#{locale}/file")
 	end
 
 	private
-
-	def project_path
-		"/projects/#{@project_context.project_id}"
-	end
 
 	def project_id
 		@project_context.project_id

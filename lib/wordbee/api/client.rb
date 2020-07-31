@@ -56,7 +56,7 @@ module Wordbee
         url = build_uri(path)
         params.merge!(CGI::parse(url.query)) if url.query
         params[:token] = @auth_token if @auth_token
-        _request(url.host, url.port, method, url.path, params: params, data: data, headers: headers, timeout: timeout, file_upload: file_upload)
+        _request(url.host, url.port, method, url.path, params: params, data: data, headers: headers, timeout: timeout, do_struct: do_struct, file_upload: file_upload)
       end
 
       def _request(host, port, method, uri, params: {}, data: {}, headers: {}, timeout: nil, do_struct: true, file_upload: false)
@@ -125,6 +125,10 @@ module Wordbee
 
       def logger
         config.logger
+      end
+
+      def name_for_file(file)
+        File.basename(file.path)
       end
 
       def file_for_upload(file)
