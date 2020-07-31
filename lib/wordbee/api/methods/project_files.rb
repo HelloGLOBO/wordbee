@@ -52,6 +52,16 @@ class FilesContext < MethodContext
 	end
 
 
+	def find(query = "", locale: 'en')
+		params = {}
+		params.merge({namepattern: query}) if query
+		self.client.request("#{@project_context.path}/files/#{locale}", params: params)
+	end
+
+	def all
+		find
+	end
+
 	def upload(file, file_name: self.client.name_for_file(file), locale: 'en', overwrite: true)
 		data = {
 				name: file_name,

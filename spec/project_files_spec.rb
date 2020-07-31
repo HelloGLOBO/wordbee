@@ -4,7 +4,6 @@ RSpec.describe Wordbee::API::Methods::ProjectFiles do
 	before :all do
 		create_client do |client|
 			project = client.projects.all.first
-			puts project.inspect
 			@project_id = project.ProjectId
 		end
 	end

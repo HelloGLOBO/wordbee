@@ -15,7 +15,13 @@ RSpec.describe Wordbee::API::Methods::ProjectDocuments do
 	it 'should download a project documents' do
 		create_client do |client|
 			expect {
-				client.projects(project_id).documents.download project_id
+				project = client.projects.all.first
+				project_context = client.projects(project.ProjectId)
+
+				documents = project_context.documents
+				document = documents.all.first
+
+				documents.download doc_id: document.DocumentId, name: document.Name
 			}.not_to raise_error
 		end
 	end

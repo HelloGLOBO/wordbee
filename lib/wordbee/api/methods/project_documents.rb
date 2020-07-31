@@ -25,9 +25,15 @@ class DocumentsContext < MethodContext
 		@project_context = project_context
 	end
 
+	def all
+		self.client.request("#{@project_context.path}/documents")
+	end
 
-	def download(locale = 'en')
-		self.client.request("#{@project_context.path}/documents/#{locale}/file")
+	def download(name: nil, doc_id: nil, locale: 'en')
+		params = {}
+		params[:name] = name if name
+		params[:docid] = doc_id if doc_id
+		self.client.request("#{@project_context.path}/documents/#{locale}/file", params: params)
 	end
 
 	private
