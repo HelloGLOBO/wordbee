@@ -52,14 +52,14 @@ module Wordbee
         false
       end
 
-      def request(path, method: 'GET', params:{}, data:{}, headers:{}, timeout: nil, do_struct: true, file_upload: false)
+      def request(path, method: 'GET', params:{}, data:nil, headers:{}, timeout: nil, do_struct: true, file_upload: false)
         url = build_uri(path)
         params.merge!(CGI::parse(url.query)) if url.query
         params[:token] = @auth_token if @auth_token
         _request(url.host, url.port, method, url.path, params: params, data: data, headers: headers, timeout: timeout, do_struct: do_struct, file_upload: file_upload)
       end
 
-      def _request(host, port, method, uri, params: {}, data: {}, headers: {}, timeout: nil, do_struct: true, file_upload: false)
+      def _request(host, port, method, uri, params: {}, data: nil, headers: {}, timeout: nil, do_struct: true, file_upload: false)
         proxy_path = @proxy_path || config.proxy_path
 
         @http_client = Faraday.new(url: 'https://' + host + ':' + port.to_s, ssl: { verify: true }) do |f|
@@ -69,13 +69,17 @@ module Wordbee
           f.proxy = proxy_path unless proxy_path.to_s.empty?
           f.options.open_timeout = timeout
           f.options.timeout = timeout
-          f.request :multipart if file_upload
           f.adapter Faraday.default_adapter
+
+          if file_upload
+            f.request :multipart
+          end
+
         end
 
         logger.debug "_request #{@http_client.inspect}"
-        logger.warn "_request.params #{params.inspect}"
-        logger.warn "_request.body #{data.inspect}"
+        logger.debug "_request.params #{params.inspect}"
+        logger.debug "_request.body #{data.inspect}"
 
         begin
           case method
@@ -92,14 +96,14 @@ module Wordbee
           raise Wordbee::API::ClientError.new(e)
         end
 
-        logger.warn "_request - #{response.inspect}"
+        logger.debug "_response - #{response.inspect}"
 
         if response.status > 299
           if response.body && response.body.include?('IP address not authorised')
             raise Wordbee::API::ClientError.new('IP Address not authorized')
           else
             message = parse_response(response, false).to_s
-            logger.warn message
+            logger.debug "_error - #{message}"
             raise Wordbee::API::ClientError.new(message)
           end
         end
@@ -136,7 +140,7 @@ module Wordbee
       end
 
       def file_for_upload(file)
-        Faraday::UploadIO.new(file.path, 'application.zip')
+        Faraday::FilePart.new(file.path, 'application/zip')
       end
 
       private

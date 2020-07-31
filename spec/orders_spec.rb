@@ -6,73 +6,46 @@ RSpec.describe Wordbee::API::Methods::Orders do
 
 	let(:test_data) {
 		{
-				"reference": "globo-order-name",
-				"client": {
-						"companyId": 570
+				reference: "globo-order-name",
+				client: {
+						companyId: company_id
 				},
-				"sourceLanguage": "en",
-				"targetLanguages": ["pl-PL", "es-ES"],
-				"deadline": nil,
-				"isDeadlineByFiles": true,
-				"files": [
-						{"name": "test.txt", "deadline": "2020-08-02T00:00:01.0000000Z"},
+				option: 5,
+				sourceLanguage: "en",
+				targetLanguages: ["pl-PL", "es-ES"],
+				deadline: nil,
+				isDeadlineByFiles: true,
+				files: [
+						{name: test_file_name, deadline: "2020-08-02T00:00:01.0000000Z"},
 				],
-				"customFields": [
+				customFields: [
 				]
 		}
 
 	}
 
-	let(:order_data) {
+	let(:standard_test_data) {
 		{
-				client: {
-						companyId: 570,
-				},
+				reference: "globo-order-name-2",
+				companyId: company_id,
+				sourceLocale: "en",
+				targetLocales: ["pl-PL", "es-ES"],
+				deadline: "2018-20-01T00:00:01.0000000Z",
 				# personId: 04645,
-				option: 5,
-				reference: 'globo-test-order',
-				manager: 1234,
-				sourceLanguage: "en",
-				targetLanguages: ['es-ES'],
-				domains: [1, 2],
-				appointmentStartDate: DateTime.now + 1000,
-				appointmentEndDate: DateTime.now + 2000,
-				isAppointment: true,
-				deadline: deadline,
-				isDeadlineByFiles: false,
-				files: [{name: test_file_name, deadline: nil}],
+				instructions: "This should noot be translated because it's a test",
 				customFields: [
-						{key: 'custom_field_1', text: 'field 1'},
-						{key: 'custom_field_2', text: 'field 2'},
-				],
+				]
 		}
 	}
 
-	let(:data) {
-		{
-				client: {
-						companyId: 570,
-				},
-				option: 5,
-				sourceLanguage: "en",
-				targetLanguages: ['es-ES'],
-				reference: 'globo-test-order',
-				deadline: nil,
-				isDeadlineByFiles: true,
-				# personId: 04645,
-				files: [{name: test_file_name, deadline: deadline}],
-		}
-	}
-
-	xit 'should define an orders object on a client' do
+	it 'should define an orders object on a client' do
 		client = create_client
 		expect(client).to respond_to(:orders)
 		res = client.orders
 		expect(res).to respond_to(:create)
-		expect(res).to respond_to(:create_standard)
 		expect(res).to respond_to(:find)
+		expect(res).to respond_to(:all)
 	end
-
 
 	it 'should create a new order' do
 		create_client do |client|
@@ -82,32 +55,24 @@ RSpec.describe Wordbee::API::Methods::Orders do
 		end
 	end
 
-	xit 'should create a new order with simple data' do
+	it 'should create a standard order' do
 		create_client do |client|
 			expect {
-				client.orders.create data, test_file
+				client.orders.create standard_test_data
 			}.not_to raise_error
 		end
 	end
 
-	xit 'should create a standard order' do
+	it 'should find an order' do
 		create_client do |client|
 			expect {
-				client.orders.create_standard order_data, test_file
+				client.orders.create test_data, test_file
+				client.orders.find("Reference=#{test_data[:reference]}")
 			}.not_to raise_error
 		end
 	end
 
-	xit 'should find an order' do
-		create_client do |client|
-			expect {
-				client.orders.create_standard order_data, test_file
-				client.orders.find("Reference=#{order_data.reference}")
-			}.not_to raise_error
-		end
-	end
-
-	xit 'should find all orders' do
+	it 'should find all orders' do
 		create_client do |client|
 			expect {
 				client.orders.all

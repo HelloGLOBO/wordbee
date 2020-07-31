@@ -25,18 +25,13 @@ class OrdersContext < MethodContext
 		@order_id = order_id
 	end
 
-	def create(data, zipped_files)
-		file = self.client.file_for_upload(zipped_files)
-		headers = {
-				# "Content-Length": file.size.to_s,
-				# "Transfer-Encoding": 'chunked',
-		}
-		self.client.request("/orders/new_form", method: 'POST', data: file, params: {data: data}, headers: headers, file_upload: true)
-	end
 
-	def create_standard(data, zipped_files)
-		file = self.client.file_for_upload(zipped_files)
-		self.client.request("/orders", method: 'POST', data: data.merge(file: file), file_upload: true)
+	def create(data, zipped_files = nil)
+		if zipped_files
+			create_with_file data, zipped_files
+		else
+			create_without_file data
+		end
 	end
 
 	def find(query)
@@ -47,6 +42,20 @@ class OrdersContext < MethodContext
 
 	def all
 		find(nil)
+	end
+
+
+	def create_with_file(data, zipped_files = nil)
+		file = self.client.file_for_upload(zipped_files)
+		headers = {
+				"Content-Type": 'application/zip',
+				"Content-Length": file.size.to_s,
+		}
+		self.client.request("/orders/newform", method: 'POST', data: file, params: {data: data.to_json}, headers: headers, file_upload: true)
+	end
+
+	def create_without_file(data)
+		self.client.request("/orders", method: 'POST', data: data.to_json)
 	end
 end
 
