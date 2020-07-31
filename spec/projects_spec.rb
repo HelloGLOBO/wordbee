@@ -17,8 +17,7 @@ RSpec.describe Wordbee::API::Methods::Projects do
 		expect(res).to respond_to(:update)
 	end
 
-
-	it 'should update project' do
+	it 'should show a project' do
 		create_client do |client|
 			expect {
 				client.projects.get project_data[:project_id]
@@ -26,10 +25,10 @@ RSpec.describe Wordbee::API::Methods::Projects do
 		end
 	end
 
-	it 'should find a project' do
+	it 'should find projects' do
 		create_client do |client|
 			expect {
-				client.projects.find "Status=0"
+				client.projects.find ""
 			}.not_to raise_error
 		end
 	end
@@ -37,7 +36,9 @@ RSpec.describe Wordbee::API::Methods::Projects do
 	it 'should update a project' do
 		create_client do |client|
 			expect {
-				client.projects.update project_data[:project_id], project_data
+				projects = client.projects.find ""
+				project = projects.first
+				client.projects.update project.ProjectId, project_data
 			}.not_to raise_error
 		end
 	end

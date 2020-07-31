@@ -58,7 +58,7 @@ class FilesContext < MethodContext
 				overwrite: overwrite,
 		}
 		file = self.client.file_for_upload(file)
-		self.client.request("#{@project_context.path}/files/#{locale}/file", method: 'POST', params: {name: file_name}, data: data.merge(file: file), file_upload: true)
+		self.client.request("#{@project_context.path}/files/#{locale}/file", method: 'POST', params: data, data: data.merge(file: file), file_upload: true)
 	end
 
 	def set_translation_mode(mode, file_name, locale: 'en', parser: nil, parser_config: nil, included_target: nil, reference: nil, version: nil, version_date: nil)
@@ -74,7 +74,7 @@ class FilesContext < MethodContext
 		data[:version] = version if version
 		data[:versiondate] = version_date if version_date
 
-		self.client.request("#{@project_context.path}/files/#{locale}/file/translation", method: 'PUT', params: {name: file_name},  data: data.to_json)
+		self.client.request("#{@project_context.path}/files/#{locale}/file/translation", method: 'PUT', params: data,  data: data.to_json)
 	end
 
 	private

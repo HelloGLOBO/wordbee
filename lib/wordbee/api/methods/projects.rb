@@ -26,10 +26,14 @@ class ProjectsContext < MethodContext
 		self.client.request(path(project_id))
 	end
 
-	def find(query)
+	def find(query = "")
 		params = {}
 		params.merge({filter: query}) if query
 		self.client.request("/projects", params: params)
+	end
+
+	def all
+		find
 	end
 
 	def update(project_id = self.project_id, data)

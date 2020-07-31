@@ -11,9 +11,8 @@ RSpec.shared_context "shared stuff" do
 		ENV['WORDBEE_COMPANY_ID'] || 570
 	}
 
-	let(:test_file_name) {
-		test_file_name
-	}
+	let(:test_file_name) { test_file_name }
+	let(:test_zip_name) { test_zip_name }
 
 	let(:test_file) {
 		File.open(File.dirname(__FILE__) + "/#{test_zip_name}")

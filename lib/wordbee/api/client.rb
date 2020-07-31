@@ -153,7 +153,7 @@ module Wordbee
                end
 
         object = begin
-                   OpenStruct.new(json)
+                   json.is_a?(Array) ? json.map {|j| OpenStruct.new(j)} : OpenStruct.new(json)
                  rescue
                    json
                  end if do_struct
