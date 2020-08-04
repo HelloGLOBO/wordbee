@@ -16,12 +16,14 @@ RSpec.describe Wordbee::API::Methods::Orders do
 				deadline: nil,
 				isDeadlineByFiles: true,
 				files: [
-						{name: test_file_name, deadline: "2020-08-02T00:00:01.0000000Z"},
+						{name: test_file_name, deadline: nil},
+						{name: test_file_name2, deadline: nil}
 				],
 				customFields: [
+            {key: "CustomStr1", text: "My Name"},
+            {key: "CustomStr2", text: "my.email@company.co"}
 				]
 		}
-
 	}
 
 	let(:standard_test_data) {

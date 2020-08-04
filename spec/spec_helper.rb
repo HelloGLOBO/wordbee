@@ -6,12 +6,14 @@ require 'byebug'
 RSpec.shared_context "shared stuff" do
 	test_zip_name = 'test.zip'
 	test_file_name = 'test.txt'
+	test_file_name2 = 'test2.txt'
 
 	let(:company_id) {
-		ENV['WORDBEE_COMPANY_ID'] || 570
+		ENV['WORDBEE_COMPANY_ID'] || 1444
 	}
 
 	let(:test_file_name) { test_file_name }
+	let(:test_file_name2) { test_file_name2 }
 	let(:test_zip_name) { test_zip_name }
 
 	let(:test_file) {
@@ -27,7 +29,7 @@ RSpec.shared_context "shared stuff" do
 		]
 
 		Wordbee.configure do |config|
-			config.logger.level = Logger::WARN
+			config.logger.level = Logger::DEBUG
 			config.proxy_path = @proxies.first
 		end
 	end
