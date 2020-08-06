@@ -1,8 +1,8 @@
 PATH
   remote: .
   specs:
-    wordbee (0.1.0.beta7)
-      faraday (>= 1.0.1, < 2.0)
+    wordbee (0.1.0.beta8)
+      faraday (>= 0.9, < 2.0)
       logger
       nokogiri (>= 1.6, < 2.0)
 

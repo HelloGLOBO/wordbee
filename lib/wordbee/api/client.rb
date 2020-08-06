@@ -140,7 +140,7 @@ module Wordbee
       end
 
       def file_for_upload(file)
-        Faraday::FilePart.new(file.path, 'application/zip')
+        Faraday::UploadIO.new(file.path, 'application/zip')
       end
 
       private
