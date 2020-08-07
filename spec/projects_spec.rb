@@ -1,5 +1,25 @@
 RSpec.describe Wordbee::API::Methods::Projects do
 
+	let(:order_data) {
+		{
+				reference: "globo-order-999992",
+				client: {
+						companyId: company_id
+				},
+				option: 5,
+				sourceLanguage: "en",
+				targetLanguages: ["pl-PL", "es-ES"],
+				deadline: nil,
+				isDeadlineByFiles: true,
+				files: [
+						{name: test_file_name, deadline: nil},
+						{name: test_file_name2, deadline: nil}
+				],
+				customFields: [
+						{key: "globo_portal_id", text: "123"}
+				]
+		}
+	}
 
 	let(:project_data) {
 		# TODO: fill
@@ -28,7 +48,8 @@ RSpec.describe Wordbee::API::Methods::Projects do
 	it 'should find projects' do
 		create_client do |client|
 			expect {
-				client.projects.find ""
+				client.orders.create order_data, test_file
+				projects = client.projects.find("Reference=\"#{order_data[:reference]}\"")
 			}.not_to raise_error
 		end
 	end

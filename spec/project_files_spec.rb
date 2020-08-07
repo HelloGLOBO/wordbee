@@ -21,7 +21,6 @@ RSpec.describe Wordbee::API::Methods::ProjectFiles do
 	it 'should upload a project file' do
 		create_client do |client|
 			expect {
-
 				client.projects(@project_id).files.upload test_file
 			}.not_to raise_error
 		end

@@ -6,7 +6,7 @@ RSpec.describe Wordbee::API::Methods::Orders do
 
 	let(:test_data) {
 		{
-				reference: "globo-order-name",
+				reference: "globo-order-999991",
 				client: {
 						companyId: company_id
 				},
@@ -20,8 +20,6 @@ RSpec.describe Wordbee::API::Methods::Orders do
 						{name: test_file_name2, deadline: nil}
 				],
 				customFields: [
-            {key: "CustomStr1", text: "My Name"},
-						{key: "CustomStr2", text: "my.email@company.co"},
 						{key: "globo_portal_id", text: "123"}
 				]
 		}
@@ -34,8 +32,7 @@ RSpec.describe Wordbee::API::Methods::Orders do
 				sourceLocale: "en",
 				targetLocales: ["pl-PL", "es-ES"],
 				deadline: "2018-20-01T00:00:01.0000000Z",
-				# personId: 04645,
-				instructions: "This should noot be translated because it's a test",
+				instructions: "This should not be translated because it's a test",
 				customFields: [
 				]
 		}

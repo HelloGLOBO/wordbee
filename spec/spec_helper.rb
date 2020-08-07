@@ -29,7 +29,7 @@ RSpec.shared_context "shared stuff" do
 		]
 
 		Wordbee.configure do |config|
-			config.logger.level = Logger::DEBUG
+			config.logger.level = Logger::WARN
 			config.proxy_path = @proxies.first
 		end
 	end

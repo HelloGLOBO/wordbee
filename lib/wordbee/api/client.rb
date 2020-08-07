@@ -69,12 +69,12 @@ module Wordbee
           f.proxy = proxy_path unless proxy_path.to_s.empty?
           f.options.open_timeout = timeout
           f.options.timeout = timeout
-          f.adapter Faraday.default_adapter
 
           if file_upload
             f.request :multipart
           end
 
+          f.adapter Faraday.default_adapter
         end
 
         logger.debug "_request #{@http_client.inspect}"
