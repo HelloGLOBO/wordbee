@@ -54,7 +54,7 @@ class FilesContext < MethodContext
 
 	def find(query = "", locale: 'en')
 		params = {}
-		params.merge({namepattern: query}) if query
+		params.merge!({namepattern: query}) if query
 		self.client.request("#{@project_context.path}/files/#{locale}", params: params)
 	end
 

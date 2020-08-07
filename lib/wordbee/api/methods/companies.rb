@@ -24,19 +24,19 @@ class CompaniesContext < MethodContext
 
   def find(query)
     params = {}
-    params.merge({filter: query}) if query
+    params.merge!({filter: query}) if query
     self.client.request("/companies", params: params)
   end
 
   def find_clients(query)
     params = {isclient: true, issupplier: false}
-    params.merge({filter: query}) if query
+    params.merge!({filter: query}) if query
     self.client.request("/companies", params: params)
   end
 
   def find_suppliers(query)
     params = {isclient: false, issupplier: true}
-    params.merge({filter: query}) if query
+    params.merge!({filter: query}) if query
     self.client.request("/companies", params: params)
   end
 

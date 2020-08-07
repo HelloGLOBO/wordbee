@@ -21,7 +21,8 @@ RSpec.describe Wordbee::API::Methods::Orders do
 				],
 				customFields: [
             {key: "CustomStr1", text: "My Name"},
-            {key: "CustomStr2", text: "my.email@company.co"}
+						{key: "CustomStr2", text: "my.email@company.co"},
+						{key: "globo_portal_id", text: "123"}
 				]
 		}
 	}
@@ -67,10 +68,13 @@ RSpec.describe Wordbee::API::Methods::Orders do
 
 	it 'should find an order' do
 		create_client do |client|
+			res = nil
 			expect {
 				client.orders.create test_data, test_file
-				client.orders.find("Reference=#{test_data[:reference]}")
+				res = client.orders.find(nil, count: 100)
+				puts res.inspect
 			}.not_to raise_error
+			expect(res).not_to be_nil
 		end
 	end
 

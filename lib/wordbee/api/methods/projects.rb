@@ -28,7 +28,7 @@ class ProjectsContext < MethodContext
 
 	def find(query = "")
 		params = {}
-		params.merge({filter: query}) if query
+		params.merge!({filter: query}) if query
 		self.client.request("/projects", params: params)
 	end
 

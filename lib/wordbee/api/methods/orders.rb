@@ -34,9 +34,8 @@ class OrdersContext < MethodContext
 		end
 	end
 
-	def find(query)
-		params = {}
-		params.merge({filter: query}) if query
+	def find(query, params = {})
+		params.merge!({filter: query}) if query
 		self.client.request("/orders", params: params)
 	end
 
