@@ -4,6 +4,15 @@ module Wordbee
 	module API
 		module Methods
 			module Projects
+
+				module Statuses
+					IN_PROGRESS = 0
+					DONE = 1
+					PREPARE = 2
+					WAIT = 3
+					ARCHIVED = 4
+				end
+
 				def projects(project_id = nil)
 					ProjectsContext.new(self, project_id)
 				end

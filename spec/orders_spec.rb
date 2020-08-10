@@ -68,8 +68,7 @@ RSpec.describe Wordbee::API::Methods::Orders do
 			res = nil
 			expect {
 				client.orders.create test_data, test_file
-				res = client.orders.find(nil, count: 100)
-				puts res.inspect
+				res = client.orders.find("Reference=#{test_data.reference}", count: 100)
 			}.not_to raise_error
 			expect(res).not_to be_nil
 		end
