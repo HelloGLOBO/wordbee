@@ -50,10 +50,6 @@ class ProjectsContext < MethodContext
 		self.client.request(path(project_id), method: 'PUT', data: data.to_json)
 	end
 
-	def quotes(project_id = self.project_id)
-		self.client.request(path(project_id) + "/invoices")
-	end
-
 	def path(project_id = @project_id)
 		"/projects/#{project_id}"
 	end
