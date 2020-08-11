@@ -71,7 +71,7 @@ class InvoicesContext < MethodContext
 	alias_method :all, :quotes
 
 	def lines(invoice_id = @invoice_id)
-		self.client.request("#{invoice_path(invoice_id)}")
+		self.client.request("#{invoice_path(invoice_id)}/lines")
 	end
 
 
