@@ -37,5 +37,13 @@ RSpec.describe Wordbee::API::Methods::Invoices do
 		end
 	end
 
+	it 'should update an invoice' do
+		create_client do |client|
+			expect {
+				client.invoices(invoice_id).update({Status: Wordbee::API::InvoiceStatuses::PROPOSAL_ACCEPTED})
+			}.not_to raise_error
+		end
+	end
+
 
 end

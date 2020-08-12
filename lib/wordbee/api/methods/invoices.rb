@@ -63,6 +63,13 @@ class InvoicesContext < MethodContext
 		self.client.request("#{invoice_path(invoice_id)}")
 	end
 
+	def update(params, invoice_id = @invoice_id)
+		params = {
+				command: params.to_json
+		}
+		self.client.request(invoice_path(invoice_id), method: 'PUT', params: params)
+	end
+
 	def quotes
 		self.client.request("/invoices")
 	end
