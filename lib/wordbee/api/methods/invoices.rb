@@ -3,6 +3,12 @@
 module Wordbee
 	module API
 
+		module TaskCodes
+			Translation = "TR"
+			Revision = "RV"
+			ApprovalOrProofreading = "APP"
+		end
+
 		module InvoiceStatuses
 			#The invoice is under preparation
 			PROPOSAL_DRAFT = 0
