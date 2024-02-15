@@ -35,6 +35,12 @@ class DocumentLibraryFilesContext < MethodContext
 		self.client.request("#{@project_context.path}/files/#{locale}/file", params: params)
 	end
 
+	def create_folder(locale, folder_name)
+		params = {}
+		params[:name] = folder_name
+		self.client.request("#{@project_context.path}/folders/#{locale}/folder", method: 'POST', params: params)
+	end
+
 	private
 
 	def project_id
