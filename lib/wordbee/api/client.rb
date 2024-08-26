@@ -27,6 +27,9 @@ module Wordbee
         self.connect
         yield self
         self.disconnect
+			rescue StandardError => e
+				raise e unless e.message.include?("expired")
+				retry
       end
 
       def connect

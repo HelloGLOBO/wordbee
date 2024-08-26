@@ -1,3 +1,3 @@
 module Wordbee
-  VERSION = "0.1.0.beta19"
+  VERSION = "0.1.0.beta20"
 end
