@@ -6,16 +6,17 @@ module Wordbee
   module API
     class Client
       include Wordbee::API::Methods
-      attr_accessor :wordbee_host, :account_id, :password, :response_format, :auth_token, :proxy_path
+      attr_accessor :wordbee_host, :account_id, :password, :response_format, :auth_token, :proxy_path, :retry_on_token_expired
 
       DEFAULT_HOST = 'https://api.eu.wordbee-translator.com:32570'
 
-      def initialize(account_id, password, host: DEFAULT_HOST, response_format: :json, proxy: nil)
+      def initialize(account_id, password, host: DEFAULT_HOST, response_format: :json, proxy: nil, retry_on_token_expired: false)
         @wordbee_host = host
         @account_id = account_id
         @password = password
         @response_format = response_format
         @proxy_path = proxy
+        @retry_on_token_expired = retry_on_token_expired
 
         do_connected do
           yield self
@@ -28,8 +29,8 @@ module Wordbee
         yield self
         self.disconnect
 			rescue StandardError => e
-				raise e unless e.message.include?("expired")
-				retry
+          retry if e.message.include?("expired") && @retry_on_token_expired
+          raise e
       end
 
       def connect
