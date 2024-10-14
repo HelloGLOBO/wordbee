@@ -28,9 +28,6 @@ module Wordbee
         self.connect
         yield self
         self.disconnect
-			rescue StandardError => e
-          retry if e.message.include?("expired") && @retry_on_token_expired
-          raise e
       end
 
       def connect
@@ -57,10 +54,18 @@ module Wordbee
       end
 
       def request(path, method: 'GET', params:{}, data:nil, headers:{}, timeout: nil, do_struct: true, file_upload: false)
-        url = build_uri(path)
-        params.merge!(CGI::parse(url.query)) if url.query
-        params[:token] = @auth_token if @auth_token
-        _request(url.host, url.port, method, url.path, params: params, data: data, headers: headers, timeout: timeout, do_struct: do_struct, file_upload: file_upload)
+        begin
+          url = build_uri(path)
+          params.merge!(CGI::parse(url.query)) if url.query
+          params[:token] = @auth_token if @auth_token
+          _request(url.host, url.port, method, url.path, params: params, data: data, headers: headers, timeout: timeout, do_struct: do_struct, file_upload: file_upload)
+        rescue StandardError => e
+          if e.message.include?("expired") && @retry_on_token_expired
+            self.connect
+            retry
+          end
+          raise e
+        end
       end
 
       def _request(host, port, method, uri, params: {}, data: nil, headers: {}, timeout: nil, do_struct: true, file_upload: false)
@@ -100,7 +105,8 @@ module Wordbee
           raise Wordbee::API::ClientError.new(e)
         end
 
-        logger.debug "_response - #{response.inspect}"
+        # temp show the response on info logs
+        logger.info "_response - #{response.inspect}"
 
         if response.status > 299
           if response.body && response.body.include?('IP address not authorised')
