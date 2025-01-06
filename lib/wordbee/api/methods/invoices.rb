@@ -87,6 +87,13 @@ class InvoicesContext < MethodContext
 		self.client.request("#{invoice_path(invoice_id)}/lines")
 	end
 
+	def find(count: 100, start_index: 0, query: "")
+		params = {}
+		params[:from] = start_index if start_index
+		params[:count] = count if count
+		params[:filter] =  query if query
+		self.client.request("/invoices", params: params)
+	end
 
 end
 

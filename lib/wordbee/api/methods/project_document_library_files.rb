@@ -25,8 +25,13 @@ class DocumentLibraryFilesContext < MethodContext
 		@project_context = project_context
 	end
 
-	def all(locale: 'en-US')
-		self.client.request("#{@project_context.path}/files/#{locale}")
+	def all(locale: 'en-US', count: 100, start_index: 0, namepattern: nil)
+		params = {}
+		params[:from] = start_index if start_index
+		params[:count] = count if count
+		params[:namepattern] = namepattern if namepattern
+
+		self.client.request("#{@project_context.path}/files/#{locale}", params: params)
 	end
 
 	def download(names, locale: 'en-US')
